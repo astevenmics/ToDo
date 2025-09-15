@@ -3,7 +3,7 @@ import java.util.Scanner;
 
 public class Main {
 
-    private static final String PROMPT = """
+    private static final String MAIN_PROMPT = """
         Commands:
         A) Create a to-do list item.
         B) View your current to-do list.
@@ -15,13 +15,14 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         ArrayList<Item> todoList = new ArrayList<>();
+        ArrayList<Item> completedToDoList = new ArrayList<>();
 
         System.out.println("Welcome to the Mist To-Do List\n");
 
-        Functions functions = new Functions();
+        MainFunctions functions = new MainFunctions();
 
         while (true) {
-            System.out.print(PROMPT + " ");
+            System.out.print(MAIN_PROMPT + " ");
             String command = scanner.nextLine();
 
             switch (command) {
@@ -29,10 +30,10 @@ public class Main {
                     todoList = functions.todoFunctionA(scanner, todoList);
                     break;
                 case "B":
-                    functions.todoFunctionB(todoList);
+                    functions.todoFunctionB(scanner, todoList, completedToDoList);
                     break;
                 case "C":
-                    functions.todoFunctionC(todoList);
+                    functions.todoFunctionC(completedToDoList);
                     break;
                 case "D":
                     return;
