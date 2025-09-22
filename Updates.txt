@@ -1,0 +1,13 @@
+=== ToDo 0.0.0.4 ===
+- Main
+* Updated functions and inputs for parameters for MainFunctions.java
+
+- ItemFunctions
+* Added getItem function to reduce code duplication in MainFunction.java by handling inputs from users
+* Renamed updateItemDescription to updateItemTitle
+
+- MainFunctions
+* Created viewTodos function with parameters to handle cases of viewing all todos or only completed todos
+* Deleted createNewToDoList function and placed it inside the addToDoItems
+* Renamed functions to provide more clarity to its uses
+* Updated each functions by removing the while loop and try-catch handlers and moving it in ItemFunctions.java
