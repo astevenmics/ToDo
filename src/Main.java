@@ -27,13 +27,13 @@ public class Main {
 
             switch (command) {
                 case "A":
-                    todoList = functions.todoFunctionA(scanner, todoList);
+                    todoList = functions.addTodoItems(scanner, todoList);
                     break;
                 case "B":
-                    functions.todoFunctionB(scanner, todoList, completedToDoList);
+                    functions.manageTodoItems(scanner, todoList, completedToDoList);
                     break;
                 case "C":
-                    functions.todoFunctionC(completedToDoList);
+                    functions.viewTodos(completedToDoList, true);
                     break;
                 case "D":
                     return;
