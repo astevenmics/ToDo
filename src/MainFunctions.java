@@ -1,9 +1,9 @@
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class MainFunctions {
 
-    public ArrayList<Item> addTodoItems(Scanner scanner, ArrayList<Item> todo) {
+    public void addTodoItems(Scanner scanner, ArrayList<Item> todo) {
         System.out.print("Please indicate the name for your To-Do item: ");
         String todoTitle = scanner.nextLine();
 
@@ -15,10 +15,9 @@ public class MainFunctions {
                 "\n - Title: " + newItem.getTitle() +
                 "\n - Completed: " + newItem.isComplete() + "\n");
 
-        return todo;
     }
 
-    public void manageTodoItems(Scanner scanner, ArrayList<Item> todo, ArrayList<Item> completedToDo) {
+    public void manageTodoItems(Scanner scanner, ArrayList<Item> todo) {
 
         if (todo.isEmpty()) {
             System.out.println("There is currently no To-Do items in the list.");
@@ -26,9 +25,10 @@ public class MainFunctions {
         }
 
         ItemFunctions itemFunctions = new ItemFunctions();
+        UserHandler userHandler = new UserHandler();
 
-        System.out.println("=== Remaining To-Do items ===");
-        viewTodos(completedToDo, false);
+        System.out.println("=== To-Do items ===");
+        viewTodos(todo, false);
 
         String itemPrompt = """
                 Commands:
@@ -46,19 +46,17 @@ public class MainFunctions {
             case "A":
                 extensionMessage = "mark as completed";
 
-                Item itemToMarkAsCompleted = itemFunctions.getItem(scanner, todo, extensionMessage);
+                Item itemToMarkAsCompleted = userHandler.getItem(scanner, todo, extensionMessage);
                 itemFunctions.setCompleted(itemToMarkAsCompleted);
 
                 System.out.println(itemToMarkAsCompleted.getTitle() + "\nStatus: " + isCompleteCheck(itemToMarkAsCompleted) + "\n\n");
 
-                completedToDo.add(itemToMarkAsCompleted);
-
-                viewTodos(completedToDo, true);
+                viewTodos(todo, true);
                 break;
 
             case "B":
                 extensionMessage = "update";
-                Item itemToUpdate = itemFunctions.getItem(scanner, todo, extensionMessage);
+                Item itemToUpdate = userHandler.getItem(scanner, todo, extensionMessage);
 
                 String oldTitle = itemToUpdate.getTitle();
                 System.out.print("Please type the new title you want for [" + itemToUpdate.getTitle() + "]: ");
@@ -69,16 +67,16 @@ public class MainFunctions {
                                 oldTitle + "\nNew title: " +
                                 newTitle + "\n"
                 );
-                viewTodos(completedToDo, false);
+                viewTodos(todo, false);
                 break;
 
             case "C":
                 extensionMessage = "delete";
-                Item itemToDelete = itemFunctions.getItem(scanner, todo, extensionMessage);
+                Item itemToDelete = userHandler.getItem(scanner, todo, extensionMessage);
                 String deletedItemTitle = itemToDelete.getTitle();
                 todo.remove(itemToDelete);
                 System.out.println("Successfully deleted: " + deletedItemTitle + "\n");
-                viewTodos(completedToDo, false);
+                viewTodos(todo, false);
                 break;
 
             case "D":
@@ -88,15 +86,21 @@ public class MainFunctions {
 
     public void viewTodos(ArrayList<Item> todo, boolean viewOnlyCompletedTodos) {
 
-        if (todo.isEmpty()) {
-            String isViewOnlyCompletedItemsOn = viewOnlyCompletedTodos ?
-                    "There is currently no completed To-Do items in the list." :
-                    "There is currently no To-Do items in the list.";
-            System.out.println(isViewOnlyCompletedItemsOn);
+        ArrayList<Item> completedToDos = todo.stream()
+                .filter(Item::isComplete)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        if(viewOnlyCompletedTodos && completedToDos.isEmpty()) {
+            System.out.println("There are currently no completed To-Do items in the list.");
+            return;
+        } else if (todo.isEmpty()) {
+            System.out.println("There are currently no To-Do items in the list.");
             return;
         }
 
-        System.out.println("=== Completed To-Do items ===");
+        if (viewOnlyCompletedTodos) {
+            System.out.println("=== Completed To-Do items ===");
+        }
         todo.stream()
                 .filter(x -> !viewOnlyCompletedTodos || x.isComplete())
                 .forEach(

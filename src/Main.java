@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -13,31 +15,32 @@ public class Main {
         Command:""";
 
     public static void main(String[] args) {
+
         Scanner scanner = new Scanner(System.in);
         ArrayList<Item> todoList = new ArrayList<>();
-        ArrayList<Item> completedToDoList = new ArrayList<>();
+        MainFunctions mainFunctions = new MainFunctions();
+
+        Map<PromptOptions, Runnable> prompts = new HashMap<>();
+        prompts.put(PromptOptions.CREATE, () -> mainFunctions.addTodoItems(scanner, todoList));
+        prompts.put(PromptOptions.VIEW, () -> mainFunctions.manageTodoItems(scanner, todoList));
+        prompts.put(PromptOptions.COMPLETED, () -> mainFunctions.viewTodos(todoList, true));
+        prompts.put(PromptOptions.EXIT, () -> System.exit(0));
+
+        Map<String, PromptOptions> promptOptions = new HashMap<>();
+        promptOptions.put("A", PromptOptions.CREATE);
+        promptOptions.put("B", PromptOptions.VIEW);
+        promptOptions.put("C", PromptOptions.COMPLETED);
+        promptOptions.put("D", PromptOptions.EXIT);
 
         System.out.println("Welcome to the Mist To-Do List\n");
 
-        MainFunctions functions = new MainFunctions();
-
+        //noinspection InfiniteLoopStatement
         while (true) {
             System.out.print(MAIN_PROMPT + " ");
             String command = scanner.nextLine();
-
-            switch (command) {
-                case "A":
-                    todoList = functions.addTodoItems(scanner, todoList);
-                    break;
-                case "B":
-                    functions.manageTodoItems(scanner, todoList, completedToDoList);
-                    break;
-                case "C":
-                    functions.viewTodos(completedToDoList, true);
-                    break;
-                case "D":
-                    return;
-            }
+            PromptOptions optionSelected = promptOptions.get(command);
+            if (optionSelected == null) { continue; }
+            prompts.get(optionSelected).run();
         }
     }
 }
