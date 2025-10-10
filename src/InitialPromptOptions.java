@@ -1,4 +1,4 @@
-public enum PromptOptions {
+public enum InitialPromptOptions {
     CREATE,
     VIEW,
     COMPLETED,

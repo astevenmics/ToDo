@@ -19,69 +19,44 @@ public class MainFunctions {
 
     public void manageTodoItems(Scanner scanner, ArrayList<Item> todo) {
 
+        ItemFunctions itemFunctions = new ItemFunctions();
+        UserHandler userHandler = new UserHandler();
+
+        Map<ItemPromptOptions, Runnable> prompts = new HashMap<>();
+        prompts.put(ItemPromptOptions.MARK_AS_COMPLETED, () -> itemFunctions.markItemCompleted(this, userHandler, scanner, todo));
+        prompts.put(ItemPromptOptions.UPDATE_TITLE, () -> itemFunctions.updateItemTitle(this, userHandler, scanner, todo));
+        prompts.put(ItemPromptOptions.DELETE, () -> itemFunctions.deleteItem(this, userHandler, scanner, todo));
+
+        Map<String, ItemPromptOptions> promptOptions = new HashMap<>();
+        promptOptions.put("A", ItemPromptOptions.MARK_AS_COMPLETED);
+        promptOptions.put("B", ItemPromptOptions.UPDATE_TITLE);
+        promptOptions.put("C", ItemPromptOptions.DELETE);
+
         if (todo.isEmpty()) {
             System.out.println("There is currently no To-Do items in the list.");
             return;
         }
 
-        ItemFunctions itemFunctions = new ItemFunctions();
-        UserHandler userHandler = new UserHandler();
+        while (true) {
+            System.out.println("=== To-Do items ===");
+            viewTodos(todo, false);
 
-        System.out.println("=== To-Do items ===");
-        viewTodos(todo, false);
+            String itemPrompt = """
+                    Commands:
+                    A) Mark as completed.
+                    B) Edit title.
+                    C) Delete.
+                    D) Return to main menu.
+                    """;
+            System.out.print(itemPrompt + "\nCommand: ");
 
-        String itemPrompt = """
-                Commands:
-                A) Mark as completed.
-                B) Edit title.
-                C) Delete.
-                D) Return to main menu.
-                """;
-        System.out.print(itemPrompt + "\nCommand: ");
-
-        String command = scanner.nextLine();
-        String extensionMessage;
-
-        switch (command) {
-            case "A":
-                extensionMessage = "mark as completed";
-
-                Item itemToMarkAsCompleted = userHandler.getItem(scanner, todo, extensionMessage);
-                itemFunctions.setCompleted(itemToMarkAsCompleted);
-
-                System.out.println(itemToMarkAsCompleted.getTitle() + "\nStatus: " + isCompleteCheck(itemToMarkAsCompleted) + "\n\n");
-
-                viewTodos(todo, true);
-                break;
-
-            case "B":
-                extensionMessage = "update";
-                Item itemToUpdate = userHandler.getItem(scanner, todo, extensionMessage);
-
-                String oldTitle = itemToUpdate.getTitle();
-                System.out.print("Please type the new title you want for [" + itemToUpdate.getTitle() + "]: ");
-                String newTitle = scanner.nextLine();
-                itemFunctions.updateItemTitle(itemToUpdate, newTitle);
-                System.out.println(
-                        "ToDo Update Success\nOld title: " +
-                                oldTitle + "\nNew title: " +
-                                newTitle + "\n"
-                );
-                viewTodos(todo, false);
-                break;
-
-            case "C":
-                extensionMessage = "delete";
-                Item itemToDelete = userHandler.getItem(scanner, todo, extensionMessage);
-                String deletedItemTitle = itemToDelete.getTitle();
-                todo.remove(itemToDelete);
-                System.out.println("Successfully deleted: " + deletedItemTitle + "\n");
-                viewTodos(todo, false);
-                break;
-
-            case "D":
-                break;
+            String command = scanner.nextLine();
+            ItemPromptOptions optionSelected = promptOptions.get(command);
+            if (command.equals("D")) { return; }
+            if (optionSelected == null) { continue; }
+            prompts.get(optionSelected).run();
         }
+
     }
 
     public void viewTodos(ArrayList<Item> todo, boolean viewOnlyCompletedTodos) {

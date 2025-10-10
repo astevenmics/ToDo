@@ -20,17 +20,17 @@ public class Main {
         ArrayList<Item> todoList = new ArrayList<>();
         MainFunctions mainFunctions = new MainFunctions();
 
-        Map<PromptOptions, Runnable> prompts = new HashMap<>();
-        prompts.put(PromptOptions.CREATE, () -> mainFunctions.addTodoItems(scanner, todoList));
-        prompts.put(PromptOptions.VIEW, () -> mainFunctions.manageTodoItems(scanner, todoList));
-        prompts.put(PromptOptions.COMPLETED, () -> mainFunctions.viewTodos(todoList, true));
-        prompts.put(PromptOptions.EXIT, () -> System.exit(0));
+        Map<InitialPromptOptions, Runnable> prompts = new HashMap<>();
+        prompts.put(InitialPromptOptions.CREATE, () -> mainFunctions.addTodoItems(scanner, todoList));
+        prompts.put(InitialPromptOptions.VIEW, () -> mainFunctions.manageTodoItems(scanner, todoList));
+        prompts.put(InitialPromptOptions.COMPLETED, () -> mainFunctions.viewTodos(todoList, true));
+        prompts.put(InitialPromptOptions.EXIT, () -> System.exit(0));
 
-        Map<String, PromptOptions> promptOptions = new HashMap<>();
-        promptOptions.put("A", PromptOptions.CREATE);
-        promptOptions.put("B", PromptOptions.VIEW);
-        promptOptions.put("C", PromptOptions.COMPLETED);
-        promptOptions.put("D", PromptOptions.EXIT);
+        Map<String, InitialPromptOptions> promptOptions = new HashMap<>();
+        promptOptions.put("A", InitialPromptOptions.CREATE);
+        promptOptions.put("B", InitialPromptOptions.VIEW);
+        promptOptions.put("C", InitialPromptOptions.COMPLETED);
+        promptOptions.put("D", InitialPromptOptions.EXIT);
 
         System.out.println("Welcome to the Mist To-Do List\n");
 
@@ -38,7 +38,7 @@ public class Main {
         while (true) {
             System.out.print(MAIN_PROMPT + " ");
             String command = scanner.nextLine();
-            PromptOptions optionSelected = promptOptions.get(command);
+            InitialPromptOptions optionSelected = promptOptions.get(command);
             if (optionSelected == null) { continue; }
             prompts.get(optionSelected).run();
         }
