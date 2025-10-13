@@ -17,20 +17,7 @@ public class Main {
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
-        ArrayList<Item> todoList = new ArrayList<>();
-        MainFunctions mainFunctions = new MainFunctions();
-
-        Map<InitialPromptOptions, Runnable> prompts = new HashMap<>();
-        prompts.put(InitialPromptOptions.CREATE, () -> mainFunctions.addTodoItems(scanner, todoList));
-        prompts.put(InitialPromptOptions.VIEW, () -> mainFunctions.manageTodoItems(scanner, todoList));
-        prompts.put(InitialPromptOptions.COMPLETED, () -> mainFunctions.viewTodos(todoList, true));
-        prompts.put(InitialPromptOptions.EXIT, () -> System.exit(0));
-
-        Map<String, InitialPromptOptions> promptOptions = new HashMap<>();
-        promptOptions.put("A", InitialPromptOptions.CREATE);
-        promptOptions.put("B", InitialPromptOptions.VIEW);
-        promptOptions.put("C", InitialPromptOptions.COMPLETED);
-        promptOptions.put("D", InitialPromptOptions.EXIT);
+        Map<String, Runnable> prompts = getStringRunnableMap(scanner);
 
         System.out.println("Welcome to the Mist To-Do List\n");
 
@@ -38,9 +25,21 @@ public class Main {
         while (true) {
             System.out.print(MAIN_PROMPT + " ");
             String command = scanner.nextLine();
-            InitialPromptOptions optionSelected = promptOptions.get(command);
+            Runnable optionSelected = prompts.get(command.toUpperCase());
             if (optionSelected == null) { continue; }
-            prompts.get(optionSelected).run();
+            optionSelected.run();
         }
+    }
+
+    private static Map<String, Runnable> getStringRunnableMap(Scanner scanner) {
+        ArrayList<Item> todoList = new ArrayList<>();
+        MainFunctions mainFunctions = new MainFunctions();
+
+        Map<String, Runnable> prompts = new HashMap<>();
+        prompts.put(InitialPromptOptions.CREATE.getOPTION_VALUE(), () -> mainFunctions.addTodoItems(scanner, todoList));
+        prompts.put(InitialPromptOptions.VIEW.getOPTION_VALUE(), () -> mainFunctions.manageTodoItems(scanner, todoList));
+        prompts.put(InitialPromptOptions.COMPLETED.getOPTION_VALUE(), () -> mainFunctions.viewTodos(todoList, true));
+        prompts.put(InitialPromptOptions.EXIT.getOPTION_VALUE(), () -> System.exit(0));
+        return prompts;
     }
 }
